@@ -115,6 +115,7 @@ export default function Home() {
   const [loadingSections, setLoadingSections] = useState<Set<SectionKey>>(new Set());
   const [searchedCompany, setSearchedCompany] = useState("");
   const [history, setHistory] = useState<SearchHistory[]>([]);
+  const [hoveredHistory, setHoveredHistory] = useState<number | null>(null);
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -206,6 +207,18 @@ export default function Home() {
     }
   };
 
+  const removeFromHistory = (companyName: string) => {
+    setHistory((prev) => {
+      const updated = prev.filter(
+        (h) => h.company.toLowerCase() !== companyName.toLowerCase()
+      );
+      try {
+        localStorage.setItem("company-intel-history", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
   const handleExportPDF = () => {
     const date = new Date().toLocaleDateString("en-GB", {
       day: "2-digit",
@@ -292,28 +305,60 @@ export default function Home() {
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 {history.map((h, i) => (
-                  <button
+                  <div
                     key={i}
-                    onClick={() => {
-                      setCompany(h.company);
-                      setUrl(h.url || "");
-                      handleSearch(h.company, h.url);
-                    }}
                     style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: "6px 8px",
+                      display: "flex",
+                      alignItems: "center",
                       borderRadius: 4,
-                      textAlign: "left",
-                      fontSize: 13,
-                      color: "#888780",
+                      background: hoveredHistory === i ? "#F1EFE8" : "none",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "#F1EFE8")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+                    onMouseEnter={() => setHoveredHistory(i)}
+                    onMouseLeave={() => setHoveredHistory(null)}
                   >
-                    {h.company}
-                  </button>
+                    <button
+                      onClick={() => {
+                        setCompany(h.company);
+                        setUrl(h.url || "");
+                        handleSearch(h.company, h.url);
+                      }}
+                      style={{
+                        flex: 1,
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "6px 8px",
+                        textAlign: "left",
+                        fontSize: 13,
+                        color: "#888780",
+                      }}
+                    >
+                      {h.company}
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFromHistory(h.company);
+                      }}
+                      title="Remove"
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "4px 6px",
+                        fontSize: 11,
+                        color: "#B4B2A9",
+                        flexShrink: 0,
+                        opacity: hoveredHistory === i ? 1 : 0,
+                        transition: "opacity 120ms",
+                        lineHeight: 1,
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = "#E24B4A")}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = "#B4B2A9")}
+                    >
+                      ×
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
