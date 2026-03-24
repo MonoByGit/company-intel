@@ -36,3 +36,71 @@ body {
 .card-fade-in {
   animation: fadeInUp 0.35s ease-out forwards;
 }
+
+/* ─── Print / PDF ─────────────────────────────────────────────────────────── */
+
+.print-only {
+  display: none !important;
+}
+
+@media print {
+  /* Show print-only elements (cover page) */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Hide screen-only elements */
+  .no-print,
+  header,
+  aside {
+    display: none !important;
+  }
+
+  /* Reset page */
+  html, body {
+    background: #ffffff !important;
+    font-size: 11px !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    color: #2C2C2A !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Remove animations */
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Full-width cards with page-break control */
+  .print-card {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 12px !important;
+  }
+
+  /* Page breaks between cards */
+  .print-card + .print-card {
+    break-before: auto;
+  }
+
+  /* Page footer */
+  @page {
+    margin: 18mm 16mm;
+    size: A4;
+  }
+
+  /* Preserve badge and metric card background colors */
+  span[style*="background"],
+  div[style*="background: #F1EFE8"],
+  div[style*="background: #FCEBEB"],
+  div[style*="background: #E1F5EE"],
+  div[style*="background: #FAEEDA"],
+  div[style*="background: #EBF2FB"],
+  div[style*="background: #F7F6F2"] {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

@@ -206,6 +206,26 @@ export default function Home() {
     }
   };
 
+  const handleExportPDF = () => {
+    const date = new Date().toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+    // Set document title so browser uses it as the default filename
+    const originalTitle = document.title;
+    const slug = searchedCompany.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    const dateSlug = new Date().toISOString().slice(0, 10);
+    document.title = `company-intel-${slug}-${dateSlug}`;
+    // Write cover info into the print cover element
+    const coverName = document.getElementById("print-cover-name");
+    const coverDate = document.getElementById("print-cover-date");
+    if (coverName) coverName.textContent = searchedCompany;
+    if (coverDate) coverDate.textContent = date;
+    window.print();
+    document.title = originalTitle;
+  };
+
   const handleReset = () => {
     setSections({});
     setLoadingSections(new Set());
@@ -223,6 +243,7 @@ export default function Home() {
     <div style={{ minHeight: "100vh", background: "#F7F6F2" }}>
       {/* Header */}
       <header
+        className="no-print"
         style={{
           padding: "16px 24px",
           borderBottom: "0.5px solid #D3D1C7",
@@ -404,7 +425,7 @@ export default function Home() {
             /* ─── Results state ─── */
             <div style={{ paddingTop: 32 }}>
               {/* Inline search bar */}
-              <div style={{ display: "flex", gap: 8, marginBottom: 28 }}>
+              <div className="no-print" style={{ display: "flex", gap: 8, marginBottom: 28 }}>
                 <input
                   type="text"
                   value={company}
@@ -459,6 +480,22 @@ export default function Home() {
                 </div>
               )}
 
+              {/* Print-only cover page */}
+              <div id="print-cover" className="print-only" style={{ display: "none" }}>
+                <div style={{ marginBottom: 8 }}>
+                  <span style={{ fontSize: 11, color: "#888780", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                    Company Intelligence Brief
+                  </span>
+                </div>
+                <h1
+                  id="print-cover-name"
+                  style={{ fontSize: 32, fontWeight: 500, color: "#2C2C2A", letterSpacing: "-0.03em", margin: "8px 0 6px" }}
+                />
+                <p id="print-cover-date" style={{ fontSize: 13, color: "#888780" }} />
+                <p style={{ fontSize: 11, color: "#B4B2A9", marginTop: 6 }}>Powered by Company Intel</p>
+                <hr style={{ border: "none", borderTop: "0.5px solid #D3D1C7", margin: "20px 0" }} />
+              </div>
+
               {/* Cards */}
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {SECTION_ORDER.map((key) => {
@@ -505,17 +542,21 @@ export default function Home() {
                 })}
               </div>
 
-              {/* Reset */}
+              {/* Actions */}
               {!isLoading && Object.keys(sections).length > 0 && (
-                <div style={{ marginTop: 24, textAlign: "center" }}>
+                <div
+                  className="no-print"
+                  style={{ marginTop: 24, display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap" }}
+                >
                   <button
                     onClick={handleReset}
                     style={{
                       background: "transparent",
                       border: "0.5px solid #D3D1C7",
                       borderRadius: 8,
-                      padding: "10px 24px",
+                      padding: "8px 16px",
                       fontSize: 13,
+                      fontWeight: 500,
                       color: "#888780",
                       cursor: "pointer",
                       letterSpacing: "-0.01em",
@@ -530,6 +571,24 @@ export default function Home() {
                     }}
                   >
                     Search another company
+                  </button>
+                  <button
+                    onClick={handleExportPDF}
+                    style={{
+                      background: "#185FA5",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "8px 16px",
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: "#E6F1FB",
+                      cursor: "pointer",
+                      letterSpacing: "-0.01em",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#155089")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "#185FA5")}
+                  >
+                    Export PDF
                   </button>
                 </div>
               )}

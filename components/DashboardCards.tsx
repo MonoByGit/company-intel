@@ -3,6 +3,7 @@
 import { Badge } from "./Badge";
 import { MetricCard } from "./MetricCard";
 import { OpportunityScore } from "./OpportunityScore";
+import { cleanObject } from "@/lib/cleanCitations";
 
 const cardStyle: React.CSSProperties = {
   background: "#FFFFFF",
@@ -30,10 +31,13 @@ const headingStyle: React.CSSProperties = {
 
 // ─── Snapshot ────────────────────────────────────────────────────────────────
 export function SnapshotCard({ data }: { data: { paragraph: string } }) {
+  const d = cleanObject(data);
   return (
-    <div className="card-fade-in" style={cardStyle}>
+    <div className="card-fade-in print-card" style={cardStyle}>
       <p style={sectionLabelStyle}>Company Snapshot</p>
-      <p style={{ fontSize: 15, color: "#2C2C2A", lineHeight: 1.7 }}>{data.paragraph}</p>
+      <p style={{ fontSize: 15, color: "#2C2C2A", lineHeight: 1.7 }}>
+        {d.paragraph || <span style={{ color: "#B4B2A9" }}>—</span>}
+      </p>
     </div>
   );
 }
@@ -44,14 +48,17 @@ export function BusinessModelCard({
 }: {
   data: { description: string; model_type: string; market_position: string };
 }) {
+  const d = cleanObject(data);
   return (
-    <div className="card-fade-in" style={cardStyle}>
+    <div className="card-fade-in print-card" style={cardStyle}>
       <p style={sectionLabelStyle}>Business Model</p>
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
-        <Badge variant="blue">{data.model_type}</Badge>
-        <Badge variant="neutral">{data.market_position}</Badge>
+        <Badge variant="blue">{d.model_type || "—"}</Badge>
+        <Badge variant="neutral">{d.market_position || "—"}</Badge>
       </div>
-      <p style={{ fontSize: 14, color: "#2C2C2A", lineHeight: 1.7 }}>{data.description}</p>
+      <p style={{ fontSize: 14, color: "#2C2C2A", lineHeight: 1.7 }}>
+        {d.description || <span style={{ color: "#B4B2A9" }}>—</span>}
+      </p>
     </div>
   );
 }
@@ -62,11 +69,12 @@ export function ChallengesCard({
 }: {
   data: { items: Array<{ title: string; detail: string }> };
 }) {
+  const d = cleanObject(data);
   return (
-    <div className="card-fade-in" style={cardStyle}>
+    <div className="card-fade-in print-card" style={cardStyle}>
       <p style={sectionLabelStyle}>Current Challenges</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        {data.items.map((item, i) => (
+        {d.items.map((item, i) => (
           <div key={i} style={{ display: "flex", gap: 12 }}>
             <span
               style={{
@@ -87,8 +95,8 @@ export function ChallengesCard({
               {i + 1}
             </span>
             <div>
-              <p style={headingStyle}>{item.title}</p>
-              <p style={{ fontSize: 13, color: "#888780", lineHeight: 1.6 }}>{item.detail}</p>
+              <p style={headingStyle}>{item.title || "—"}</p>
+              <p style={{ fontSize: 13, color: "#888780", lineHeight: 1.6 }}>{item.detail || "—"}</p>
             </div>
           </div>
         ))}
@@ -106,8 +114,9 @@ export function TechStackCard({
 }: {
   data: { items: Array<{ name: string; category: string; confidence: string }> };
 }) {
+  const d = cleanObject(data);
   return (
-    <div className="card-fade-in" style={cardStyle}>
+    <div className="card-fade-in print-card" style={cardStyle}>
       <p style={sectionLabelStyle}>Tech Stack Signals</p>
       <div
         style={{
@@ -116,7 +125,7 @@ export function TechStackCard({
           gap: 10,
         }}
       >
-        {data.items.map((item, i) => (
+        {d.items.map((item, i) => (
           <div
             key={i}
             style={{
@@ -127,12 +136,12 @@ export function TechStackCard({
             }}
           >
             <p style={{ fontSize: 13, fontWeight: 500, color: "#2C2C2A", marginBottom: 4 }}>
-              {item.name}
+              {item.name || "—"}
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 11, color: "#888780" }}>{item.category}</span>
+              <span style={{ fontSize: 11, color: "#888780" }}>{item.category || "—"}</span>
               <Badge variant={confidenceVariant(item.confidence)}>
-                {item.confidence}
+                {item.confidence || "—"}
               </Badge>
             </div>
           </div>
@@ -155,19 +164,20 @@ export function GrowthSignalsCard({
     team_size_estimate: string;
   };
 }) {
+  const d = cleanObject(data);
   return (
-    <div className="card-fade-in" style={cardStyle}>
+    <div className="card-fade-in print-card" style={cardStyle}>
       <p style={sectionLabelStyle}>Growth Signals</p>
       <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
-        <MetricCard label="Funding Stage" value={data.funding_stage} />
-        <MetricCard label="Team Size" value={data.team_size_estimate} />
+        <MetricCard label="Funding Stage" value={d.funding_stage || "—"} />
+        <MetricCard label="Team Size" value={d.team_size_estimate || "—"} />
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {data.signals.map((signal, i) => (
+        {d.signals.map((signal, i) => (
           <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-            <Badge variant={sentimentVariant(signal.sentiment)}>{signal.type}</Badge>
+            <Badge variant={sentimentVariant(signal.sentiment)}>{signal.type || "—"}</Badge>
             <p style={{ fontSize: 13, color: "#888780", lineHeight: 1.6, marginTop: 1 }}>
-              {signal.detail}
+              {signal.detail || "—"}
             </p>
           </div>
         ))}
@@ -182,11 +192,12 @@ export function ConversationStartersCard({
 }: {
   data: { questions: Array<{ question: string; rationale: string }> };
 }) {
+  const d = cleanObject(data);
   return (
-    <div className="card-fade-in" style={cardStyle}>
+    <div className="card-fade-in print-card" style={cardStyle}>
       <p style={sectionLabelStyle}>Conversation Starters</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        {data.questions.map((q, i) => (
+        {d.questions.map((q, i) => (
           <div
             key={i}
             style={{
@@ -195,9 +206,9 @@ export function ConversationStartersCard({
             }}
           >
             <p style={{ fontSize: 14, fontWeight: 500, color: "#2C2C2A", marginBottom: 4 }}>
-              {q.question}
+              {q.question || "—"}
             </p>
-            <p style={{ fontSize: 12, color: "#888780", lineHeight: 1.5 }}>{q.rationale}</p>
+            <p style={{ fontSize: 12, color: "#888780", lineHeight: 1.5 }}>{q.rationale || "—"}</p>
           </div>
         ))}
       </div>

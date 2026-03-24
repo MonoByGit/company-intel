@@ -1,5 +1,7 @@
 "use client";
 
+import { cleanCitations } from "@/lib/cleanCitations";
+
 interface OpportunityScoreProps {
   score: number;
   rationale: string;
@@ -14,12 +16,14 @@ function getScoreStyle(score: number) {
 
 export function OpportunityScore({ score, rationale, factors }: OpportunityScoreProps) {
   const { color, bg, label } = getScoreStyle(score);
+  const cleanRationale = cleanCitations(rationale);
+  const cleanFactors = factors.map(cleanCitations);
   const circumference = 2 * Math.PI * 45; // r=45
   const offset = circumference - (score / 10) * circumference;
 
   return (
     <div
-      className="card-fade-in"
+      className="card-fade-in print-card"
       style={{
         background: "#FFFFFF",
         border: "0.5px solid #D3D1C7",
@@ -109,10 +113,10 @@ export function OpportunityScore({ score, rationale, factors }: OpportunityScore
             {label} Opportunity
           </div>
           <p style={{ fontSize: 14, color: "#2C2C2A", lineHeight: 1.6, marginBottom: 14 }}>
-            {rationale}
+            {cleanRationale || <span style={{ color: "#B4B2A9" }}>—</span>}
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {factors.map((factor, i) => (
+            {cleanFactors.map((factor, i) => (
               <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
                 <span
                   style={{
@@ -125,7 +129,7 @@ export function OpportunityScore({ score, rationale, factors }: OpportunityScore
                   }}
                 />
                 <span style={{ fontSize: 13, color: "#888780", lineHeight: 1.5 }}>
-                  {factor}
+                  {factor || "—"}
                 </span>
               </div>
             ))}
